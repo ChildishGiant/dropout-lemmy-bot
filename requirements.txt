@@ -1,0 +1,4 @@
+python-dotenv==1.0.1
+pythorhead==0.25.2
+selenium==4.24.0
+yt-dlp==2024.8.6

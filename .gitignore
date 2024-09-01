@@ -1,0 +1,6 @@
+#Secrets
+.env 
+# Python env
+env
+# Output data
+videos_metadata.json
