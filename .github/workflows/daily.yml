@@ -1,5 +1,6 @@
 name: Daily posts
 on:
+  workflow_dispatch: # Allow manual action triggering
   schedule:
     - cron: "15 0 * * *" # Run daily at quarter past midnight utc 
   
