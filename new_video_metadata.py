@@ -4,6 +4,7 @@ import yt_dlp
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.firefox.options import Options
 from time import sleep
 import json
 import re
@@ -104,8 +105,13 @@ def download_playlist_info(playlist_url):
         playlist_dict = ydl.extract_info(playlist_url, download=False)
         # print(playlist_dict)
 
+        # Selenium options
+        options = Options()
+        # Run selenium headless for github actions
+        options.add_argument("--headless") 
+
         # Initialize the WebDriver (you might need to specify the path to the WebDriver executable)
-        driver = webdriver.Firefox()  # or use Chrome, Edge, etc.
+        driver = webdriver.Firefox(options=options)  # or use Chrome, Edge, etc.
 
         # Load the playlist page so we can set cookies
         driver.get(playlist_url)
