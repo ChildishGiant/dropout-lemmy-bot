@@ -12,6 +12,3 @@ python new_video_metadata.py
 # Parse that data, checking if it's already been posted and asking to post it if not
 python lemmy_poster.py
 ```
-
-### TODO
-- [ ] Set up cron to run just after videos are typically uploaded.

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import json
 import re
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -19,6 +20,33 @@ dropout_community = lemmy.discover_community("dropout")
 serial_title_template = "{title} - {series} S{season}E{episode:02}"
 one_off_title_template = "{title}"
 
+mode = "automatic" # "manual"
+recency = 2 # How many days back do we want to check
+
+def to_post (video):
+    
+    if mode == "automatic":
+        # Date x days ago
+        past = datetime.now() - timedelta(days=recency)
+        # Date parsing
+        year, month, day = video['date'].split("-")
+        video_date = datetime(int(year), int(month), int(day))
+        
+        # Date is between x days ago and now
+        if past < video_date and video_date <= datetime.now():
+            return True
+        else:
+            print ("Skipping {}, too long ago".format(video['title']))
+            return False
+        
+    elif mode == "manual":
+        print("Title:", title)
+        print("Description:", description)
+        response = input ("Post? (Y/N)")
+        if response.lower()[:1] == "y":
+            return True
+        else:
+            return False
 
 with open('videos_metadata.json', 'r') as file:
     videos = json.load(file)
@@ -31,7 +59,7 @@ with open('videos_metadata.json', 'r') as file:
         for result in search_results['posts']:            
             # If this search result has the same url
             if result['post']['url'] == video['url']: 
-                print("Skip {}, already posted: {}".format(video['title'], result['post']['ap_id']))
+                print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
                 posted_already = True # skip it
         
         if posted_already:
@@ -52,17 +80,13 @@ with open('videos_metadata.json', 'r') as file:
             # If it's not got a series, season or episode just use the title
             title = one_off_title_template.format_map(video)
         
-
-        print("Title:", title)
-        print("Description:", description)
-        response = input ("Post? (Y/N)")
         
-        if response.lower()[:1] == "y":
-            lemmy.post.create(dropout_community, name=title, body=description, url=video['url'])
-            print("posted")
-        else:
-            print("not posting")
-        
-        # Check if this has already been posted
-        
-            
+        if to_post(video):
+            outcome = lemmy.post.create(
+                dropout_community, # Community to post to 
+                name=title, 
+                body=description, 
+                url=video['url'], 
+                language_id=0 # Undefined language so that people actually see it
+                )
+            print("Posted:", outcome['post_view']['post']['ap_id'])
