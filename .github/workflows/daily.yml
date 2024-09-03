@@ -1,11 +1,11 @@
 name: Daily posts
 on:
   schedule:
-    - cron: "15 0 * * *" # Run at quarter past midnight utc
+    - cron: "15 0 * * *" # Run daily at quarter past midnight utc 
   
 jobs:
   post_videos:
-    runs-on: ubuntu-latest:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Create env file
