@@ -4,3 +4,5 @@
 env
 # Output data
 videos_metadata.json
+# Cookies
+dropout_cookies.txt

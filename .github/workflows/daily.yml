@@ -14,6 +14,9 @@ jobs:
           touch .env
           echo LEMMY_USERNAME=${{ secrets.LEMMY_USERNAME }} >> .env
           echo LEMMY_PASSWORD=${{ secrets.LEMMY_PASSWORD }} >> .env
+      - name: Write dropout cookies to file
+        run: |
+          printf "%s" "${{ secrets.DROPOUT_COOKIES }}" > dropout_cookies.txt
       - name: Setup python
         uses: actions/setup-python@v5
         with:

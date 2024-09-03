@@ -91,7 +91,7 @@ def download_playlist_info(playlist_url):
     videos = []
     
     # Path to Netscape cookies file
-    cookies_file_path = "../dropout_cookies.txt"
+    cookies_file_path = "./dropout_cookies.txt"
 
     # Configure options for yt-dlp
     ydl_opts = {
