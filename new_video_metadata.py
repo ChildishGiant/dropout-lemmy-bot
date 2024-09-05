@@ -38,8 +38,7 @@ def load_cookies_from_netscape(file_path, current_url):
 def get_video_info(video_url, driver):
     # Open the URL
     driver.get(video_url)
-    # Wait a second for the page to load more
-    sleep(1)
+    print("Loading page,", video_url)
     
     info = {'url':video_url}
 
@@ -48,11 +47,6 @@ def get_video_info(video_url, driver):
     title_element = driver.find_element(By.CSS_SELECTOR, title_query_string)
     title_text = title_element.text
     info['title'] = title_text
-
-    date_query_string = '[data-meta-field-name="release_dates"]' 
-    date_element = driver.find_element(By.CSS_SELECTOR, date_query_string)
-    date_text = date_element.get_attribute("data-meta-field-value")
-    info['date'] = date_text
     
     description_query_string = '[data-text-show-less="Show less"]'
     description_element = driver.find_element(By.CSS_SELECTOR, description_query_string)

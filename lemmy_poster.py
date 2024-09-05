@@ -21,27 +21,21 @@ serial_title_template = "{title} - {series} S{season}E{episode:02}"
 one_off_title_template = "{title}"
 
 mode = "automatic" # "manual"
-recency = 2 # How many days back do we want to check
+recency = 5 # How many videos back do we want to check
 
-def to_post (video):
+def to_post (video, index):
     
     if mode == "automatic":
-        # Date x days ago
-        past = datetime.now() - timedelta(days=recency)
-        # Date parsing
-        year, month, day = video['date'].split("-")
-        video_date = datetime(int(year), int(month), int(day))
-        
-        # Date is between x days ago and now
-        if past < video_date and video_date <= datetime.now():
+        # If it's one of the x most recent videos
+        if index < 5:
             return True
         else:
             print ("Skipping {}, too long ago".format(video['title']))
             return False
-        
+
     elif mode == "manual":
-        print("Title:", title)
-        print("Description:", description)
+        print("Title:", video['title'])
+        print("Description:", video['description'])
         response = input ("Post? (Y/N)")
         if response.lower()[:1] == "y":
             return True
@@ -51,37 +45,41 @@ def to_post (video):
 with open('videos_metadata.json', 'r') as file:
     videos = json.load(file)
     
-    for video in videos:        
-        
-        search_results = lemmy.search(video['title'], community_id=dropout_community)
-        posted_already = False
-        
-        for result in search_results['posts']:            
-            # If this search result has the same url
-            if result['post']['url'] == video['url']: 
-                print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
-                posted_already = True # skip it
-        
-        if posted_already:
-            continue # Skip already posted
-        
-        description = video['description']
+    for index in range(0, len(videos)):        
 
-        tags_header = description.find("Tags") # Get the position for the "Tags" text
-        description = description[:tags_header].strip() # Cut off tags
+        video = videos[index]
         
-        title = ""
-        
-        
-        try:
-            # Set title to have the series season:episode in
-            title = serial_title_template.format_map(video)
-        except KeyError:
-            # If it's not got a series, season or episode just use the title
-            title = one_off_title_template.format_map(video)
-        
-        
-        if to_post(video):
+        # Check if we want to post the video before searching for it etc
+        if to_post(video, index):
+            
+            # Search for a post with this title
+            search_results = lemmy.search(video['title'], community_id=dropout_community)
+            posted_already = False
+            
+            for result in search_results['posts']:            
+                # If this search result has the same url
+                if result['post']['url'] == video['url']: 
+                    print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
+                    posted_already = True # skip it
+            
+            if posted_already:
+                continue # Skip already posted
+            
+            description = video['description']
+
+            tags_header = description.find("Tags") # Get the position for the "Tags" text
+            description = description[:tags_header].strip() # Cut off tags
+            
+            title = ""
+            
+            
+            try:
+                # Set title to have the series season:episode in
+                title = serial_title_template.format_map(video)
+            except KeyError:
+                # If it's not got a series, season or episode just use the title
+                title = one_off_title_template.format_map(video)
+            
             outcome = lemmy.post.create(
                 dropout_community, # Community to post to 
                 name=title, 
@@ -89,4 +87,4 @@ with open('videos_metadata.json', 'r') as file:
                 url=video['url'], 
                 language_id=0 # Undefined language so that people actually see it
                 )
-            print("Posted:", outcome['post_view']['post']['ap_id'])
+            print("Posted {}: {}".format(video['title'], outcome['post_view']['post']['ap_id']))
