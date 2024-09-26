@@ -1,6 +1,6 @@
 # Dropout Bot for Lemmy
 
-A quickly cobbled-together script that keeps [lemmy.blahaj.zone/c/dropout](https://lemmy.blahaj.zone/c/dropout) up to date.
+A quickly cobbled-together script that keeps [lemmy.blahaj.zone/c/dropout](https://lemmy.blahaj.zone/c/dropout) up to date. It runs daily as a [github action](.github/workflows/daily.yml)
 
 Currently the way to use this is:
 ```sh
@@ -10,5 +10,5 @@ python -m pip install -r requirements.txt
 # Download the 20 latest videos and store their metadata in videos_metadata.json
 python new_video_metadata.py
 # Parse that data, checking if it's already been posted and asking to post it if not
-python lemmy_poster.py
+python lemmy_poster.py --manual
 ```
