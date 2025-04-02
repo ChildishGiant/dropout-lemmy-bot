@@ -1,6 +1,7 @@
 # Copyright 2024 Allie Law <allie@cloverleaf.app>
 # SPDX-License-Identifier: GPL-3.0-or-later
 from pythorhead import Lemmy
+from pythorhead.types import SortType, SearchType
 from dotenv import load_dotenv
 import os
 import json
@@ -50,6 +51,7 @@ def to_post (video, index):
 with open(args.file, 'r') as file:
     videos = json.load(file)
 
+    # For each video in the json
     for index in range(0, len(videos)):        
 
         video = videos[index]
@@ -58,12 +60,24 @@ with open(args.file, 'r') as file:
         if to_post(video, index):
 
             # Search for a post with this title
-            search_results = lemmy.search(video['title'], community_id=dropout_community)
+            title_search_results = lemmy.search(video['title'], 
+                                                community_id=dropout_community, 
+                                                sort=SortType.New, 
+                                                type_=SearchType.Posts
+            )
+            # Search for the 10 most recent posts
+            recent_search_results = lemmy.search("", 
+                                                community_id=dropout_community, 
+                                                sort=SortType.New, 
+                                                type_=SearchType.Posts
+            )
+            # Combine the both
+            combined_search_results = title_search_results['posts'] + recent_search_results['posts']
             posted_already = False
 
-            for result in search_results['posts']:            
-                # If this search result has the same url
-                if result['post']['url'] == video['url']: 
+            for result in combined_search_results:   
+                # If this search result has the same url or title as this video
+                if result['post']['url'] == video['url'] or result['post']['name'] == video['title']: 
                     print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
                     posted_already = True # skip it
 
