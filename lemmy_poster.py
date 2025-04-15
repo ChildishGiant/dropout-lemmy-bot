@@ -77,10 +77,13 @@ with open(args.file, 'r') as file:
 
             for result in combined_search_results:   
                 # If this search result has the same url or title as this video
-                if result['post']['url'] == video['url'] or result['post']['name'] == video['title']: 
-                    print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
-                    posted_already = True # skip it
-
+                try:
+                    if result['post']['url'] == video['url'] or result['post']['name'] == video['title']: 
+                        print("Skipping {}, already posted: {}".format(video['title'], result['post']['ap_id']))
+                        posted_already = True # skip it
+                except KeyError:
+                    print("Skipped post comparision with {} due to no link".format(result["post"]["name"]))
+                
             if posted_already:
                 continue # Skip already posted
 
