@@ -130,8 +130,8 @@ def download_playlist_info(playlist_url):
     
 
 # Example URLs
-video = "https://www.dropout.tv/new-releases/videos/either-nothing-or-ube"
-new_videos_playlist = "https://www.dropout.tv/new-releases"
+# video = "https://www.dropout.tv/new-releases/videos/either-nothing-or-ube"
+new_videos_playlist = "https://watch.dropout.tv/new-releases/"
 
 # Download playlist info
 videos_metadata = download_playlist_info(new_videos_playlist)
