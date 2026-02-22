@@ -12,7 +12,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Read videos from a file and choose to post them or not")
 parser.add_argument("-m", "--manual", action="store_true")
 parser.add_argument("-f", "--file", default="videos_metadata.json", required=False)
-parser.add_argument("-r", "--recency", default=5, type=int) # How many videos back do we want to check
+parser.add_argument("-r", "--recency", default=8, type=int) # How many videos back do we want to check
 
 args = parser.parse_args()
 
@@ -31,6 +31,12 @@ one_off_title_template = "{title}"
 
 def to_post (video, index):
 
+    # If we can't find the title, we can't post it
+    if not "title" in video:
+        print("Skipping {}, no title".format(video['url']))
+        return False
+
+    # In automatic mode
     if args.manual is False:
         # If it's one of the x most recent videos
         if index < args.recency:
@@ -39,6 +45,7 @@ def to_post (video, index):
             print ("Skipping {}, too long ago".format(video['title']))
             return False
 
+    # In manual mode
     elif args.manual is True:
         print("Title:", video['title'])
         print("Description:", video['description'])

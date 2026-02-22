@@ -42,11 +42,16 @@ def get_video_info(video_url, driver):
     
     info = {'url':video_url}
 
-    # Select the element using a query string and extract its text
-    title_query_string = '.head.video-title'
-    title_element = driver.find_element(By.CSS_SELECTOR, title_query_string)
-    title_text = title_element.text
-    info['title'] = title_text
+    # Try to find the video title
+    try:
+        title_query_string = '.head.collection-title'
+        title_element = driver.find_element(By.CSS_SELECTOR, title_query_string)
+        title_text = title_element.text
+        info['title'] = title_text
+    except (NoSuchElementException):
+        # No title
+        print("Cannot find title on " + video_url)
+        pass
     
     description_query_string = '[data-text-show-less="Show less"]'
     description_element = driver.find_element(By.CSS_SELECTOR, description_query_string)
@@ -61,6 +66,7 @@ def get_video_info(video_url, driver):
         info['series'] = series_text
     except (NoSuchElementException):
         # No series
+        print("Cannot find series on " + video_url)
         pass
 
     try:
@@ -75,6 +81,7 @@ def get_video_info(video_url, driver):
     # Errors caused by not having a season, episode
     except (NoSuchElementException, AttributeError):
         # No season/episode
+        print("Cannot find season/episode on " + video_url)
         pass
     
 
